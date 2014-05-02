@@ -1,0 +1,13 @@
+exportPattern("^[[:alpha:]]+")
+exportMethods(
+    "evaluator",
+    "getMissRate",
+    "getSize",
+    "impute",
+    "show" 
+)
+exportClasses(
+    "IMPData",
+     "MVData",
+     "TEData" 
+)
