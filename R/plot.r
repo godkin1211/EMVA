@@ -8,19 +8,19 @@ plotter <- function(x, index="NRMSE", fileformat="png", xlab) {
             xlab("Missing Rate (%)")+
             ylab("NRMSE")
         if (fileformat == "png") {
-            png(filename="nrmse.png",width=1600,height=600,bg="white",res=NA)
+            png(filename="nrmse.png",width=1600,height=800,bg="white",res=NA)
             print(p1)
             dev.off()
         } else if (fileformat == "tiff") {
-            tiff(filename="nrmse.tiff",width=1600,height=600,bg="white",res=NA)
+            tiff(filename="nrmse.tiff",width=1600,height=800,bg="white",res=NA)
             print(p1)
             dev.off()
         } else if (fileformat == "jpg") {
-            jpeg(filename="nrmse.jpg",width=1600,height=600,bg="white",res=NA)
+            jpeg(filename="nrmse.jpg",width=1600,height=800,bg="white",res=NA)
             print(p1)
             dev.off()
         } else {
-            bmp(fileformat == "nrmse.bmp", width=1600, height=600, bg="white", res=NA)
+            bmp(fileformat == "nrmse.bmp", width=1600, height=800, bg="white", res=NA)
             print(p1)
             dev.off()
         }
@@ -30,21 +30,21 @@ plotter <- function(x, index="NRMSE", fileformat="png", xlab) {
             geom_point(aes(shape=Method),size=7)+
             scale_x_continuous(breaks=number_ticks(20))+
             xlab("Missing Rate (%)")+
-            ylab("CPP")       
+            ylab("CPP")
         if (fileformat == "png") {
-            png(filename="cpp.png",width=1600,height=600,bg="white",res=NA)
+            png(filename="cpp.png",width=1600,height=800,bg="white",res=NA)
             print(p1)
             dev.off()
         } else if (fileformat == "tiff") {
-            tiff(filename="cpp.tiff",width=1600,height=600,bg="white",res=NA)
+            tiff(filename="cpp.tiff",width=1600,height=800,bg="white",res=NA)
             print(p1)
             dev.off()
         } else if (fileformat == "jpg") {
-            jpeg(filename="cpp.jpg",width=1600,height=600,bg="white",res=NA)
+            jpeg(filename="cpp.jpg",width=1600,height=800,bg="white",res=NA)
             print(p1)
             dev.off()
         } else {
-            bmp(fileformat == "cpp.bmp", width=1600, height=600, bg="white", res=NA)
+            bmp(fileformat == "cpp.bmp", width=1600, height=800, bg="white", res=NA)
             print(p1)
             dev.off()
         }
@@ -52,23 +52,23 @@ plotter <- function(x, index="NRMSE", fileformat="png", xlab) {
         p1<-ggplot(x.transform,aes(x=xlab,y=BLCI,colour=Method))+
             geom_line(aes(group=Method),size=1.5)+
             geom_point(aes(shape=Method),size=7)+
-            scale_x_continuous(breaks=number_ticks(20))+
+            scale_x_continuous(breaks=number_ticks(10))+
             xlab("Missing Rate (%)")+
             ylab("BLCI")
         if (fileformat == "png") {
-            png(filename="blci.png",width=1600,height=600,bg="white",res=NA)
+            png(filename="blci.png",width=1600,height=800,bg="white",res=NA)
             print(p1)
             dev.off()
         } else if (fileformat == "tiff") {
-            tiff(filename="blci.tiff",width=1600,height=600,bg="white",res=NA)
+            tiff(filename="blci.tiff",width=1600,height=800,bg="white",res=NA)
             print(p1)
             dev.off()
         } else if (fileformat == "jpg") {
-            jpeg(filename="blci.jpg",width=1600,height=600,bg="white",res=NA)
+            jpeg(filename="blci.jpg",width=1600,height=800,bg="white",res=NA)
             print(p1)
             dev.off()
         } else {
-            bmp(fileformat == "blci.bmp", width=1600, height=600, bg="white", res=NA)
+            bmp(fileformat == "blci.bmp", width=1600, height=800, bg="white", res=NA)
             print(p1)
             dev.off()
         }

@@ -37,20 +37,16 @@ KNNimpute<-function(x, k=15, sim.method="euclidean"){
 
 # IKNN
 IKNNimpute<-function(x, k=10, sim.method="euclidean", iter=3, e=1e-3) {
-    cat(sprintf("k = %g, iter= %g, e = %g\n",k,iter,e))
     missIdx<-is.na(x)
     rowNum<-nrow(x)
     miss.RowIdx<-which(rowSums(missIdx) != 0)
     x.ravged<-RAVGimpute(x)
-    cat("Row average imputation completed!\n")
     x.miss<-(cbind(1:rowNum, x))[miss.RowIdx,]
     x.complete<-x.ravged
-    cat("The size of x.complete:",dim(x.complete),"\n")
     err<-99
     for (r in 1:iter) {
         x.old<-x.complete
         err.old<-err
-        cat(sprintf("Start the %g cycle of iknn imputation\n", r))
         x.imputed<-t(apply(x.miss, 1, function(j) {
             rowIdx<-j[1]
             j.origin<-j[-1]
@@ -67,10 +63,8 @@ IKNNimpute<-function(x, k=10, sim.method="euclidean", iter=3, e=1e-3) {
             j.origin[missColIdx]<-estimation
             return(j.origin)
         }))
-        cat(sprintf("The %g cycle imputation has been completed\n",r))
         x.complete[miss.RowIdx,]<-x.imputed
         err<-sum((x.old[missIdx]-x.complete[missIdx])^2)
-        cat("err:",err,"\n")
         if (r>1) if ((err.old/err < 4) | (err < e)) break 
     }
     x<-x.complete
@@ -88,9 +82,9 @@ SKNNimpute<-function(x, k=10, sim.method="euclidean"){
     miss.list<-order(rowSums(is.na(x.missingRows)))
     for (i in seq(nrow(x.missingRows))) {
         target<-x.missingRows[miss.list[i],]
-        dist.list<-similarityCal(target, x.completeRows, sim.method)
-        neighborsIdx<-order(abs(dist.list),decreasing=T)[1:k]
         missColIdx<-which(is.na(target))
+        dist.list<-similarityCal(target[-missColIdx], x.completeRows[,-missColIdx], sim.method)
+        neighborsIdx<-order(abs(dist.list),decreasing=T)[1:k]
         estimation<-sapply(missColIdx, function(j){
             weight<-dist.list[neighborsIdx]
             weightedAvg<-weight %*% x.completeRows[neighborsIdx,j] / sum(weight)
@@ -105,36 +99,23 @@ SKNNimpute<-function(x, k=10, sim.method="euclidean"){
 }
 
 # SVD
-SVDimpute<-function(x, k=15, iters=10, sim.method="euclidean"){
-    missing.matrix <- is.na(x)
-    numMissing <- sum(missing.matrix)
-    print(paste("imputing on", numMissing, "missing values with matrix size", nrow(x)*ncol(x), sep=" "))
-    if(numMissing == 0) return (x)
-    miss.colIdx <- which(apply(missing.matrix, 2, function(i) any(i) )) 
-    x.missing <- (rbind(1:ncol(x), x))[,miss.colIdx]
-    x.imputed <- apply(x.missing, 2, function(j) {
-        colIdx <- j[1]
-        j.original <- j[-1]
-        missing.rows <- which(missing.matrix[,colIdx])
-        if(length(missing.rows) == nrow(x))
-            warning( paste("Column",colIdx,"is completely missing",sep=" ") )
-        j.original[missing.rows] <- mean(j.original[-missing.rows])
-        j.original
-    })
-    x[,miss.colIdx] <- x.imputed
-    missing.matrix2 <- is.na(x)
-    x[missing.matrix2] <- 0
+SVDimpute<-function(x, k=15, iters=10){
+    if (ncol(x) < k) k<-ncol(x)
+    missIdx <- is.na(x)
+	# First, replace MVs with row-average/col-average
+	x.imputed<-RAVGimpute(x)
+    x <- x.imputed
+	# Second, using singular value decompostion to re-estimation original MVs.
     for(i in 1:iters) {
-        print(paste("Running iteration", i, sep=" "))
         x.svd <- svd(x, nu=k, nv=k)
         x.svd <- x.svd$u %*% diag(x.svd$d[1:k],nrow=k,ncol=k) %*% t(x.svd$v)
-        x[missing.matrix] <- x.svd[missing.matrix]
+        x[missIdx] <- x.svd[missIdx]
     }
     return(x)
 }
 
 # LSimpute
-LSimpute<-function(x, k=15, sim.method="pearson", e=1e-6){
+LSimpute<-function(x, k=15, sim.method="euclidean", e=1e-6){
     rowNum<-nrow(x)
     colNum<-ncol(x)
     missIdx<-is.na(x)
@@ -189,9 +170,8 @@ LLSimpute<-function(x, k=50, sim.method="euclidean"){
         return(i)
     }))
     x[missRowIdx,]<-imputed
-    cat("LLS imputation completed!\n")
     return(x)
 }
 
 # User-defined
-#USRimpute<-function(usr.FUN,x, ...) { usr.FUN(x, ...) }
+#USRimpute<-function(x, ...) {  }

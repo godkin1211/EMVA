@@ -7,9 +7,10 @@ This function is used to perform a complete performance-comparison simulation.
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
+
 }
 \usage{
-simulator(inputData, selected.md = c("zero", "ravg", "knn", "svd", "lls"), runs = 5, ksets = list(k1 = 10, k2 = 10, k3 = 10, k4 = 10, k5 = 10, k6 = 50), performance.idx = "nrmse", missRates = c(1, 5, 10, 15, 20), output.format = "png")
+simulator(inputData, selected.md = c("zero", "ravg", "knn", "svd", "lls"), runs = 5, ksets = list(knn.k = 10, iknn.k = 10, sknn.k = 10, svd.k = 10, ls.k = 10, lls.k = 50), performance.idx = "nrmse", missRates = c(1, 5, 10, 15, 20), output.format = "png")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -21,6 +22,7 @@ simulator(inputData, selected.md = c("zero", "ravg", "knn", "svd", "lls"), runs 
 }
   \item{runs}{
 %%     ~~Describe \code{runs} here~~
+
 }
   \item{ksets}{
 %%     ~~Describe \code{ksets} here~~

@@ -37,11 +37,12 @@ CPPcal<-function(mat.com,mat.imp,k,iter.max=10){
 }
 
 # BLCI
-BLCIcal<-function(mat.com, mat.imp,resp.type="Pattern discovery",nperms=100){
+BLCIcal<-function(mat.com, mat.imp, resp.type="Pattern discovery", eg=10, nperms=100){
+    if (sum(is.na(mat.imp))) stop("There exists NAs in imputed matrix!")
     genenames<-paste("GENE",as.character(1:nrow(mat.com)),sep="")
     geneid<-as.character(1:nrow(mat.com))
-    ans.data<-list(x=mat.com, eigengene.number=10, geneid=geneid, genenames=genenames)
-    imp.data<-list(x=mat.imp, eigengene.number=10, geneid=geneid, genenames=genenames)
+    ans.data<-list(x=mat.com, eigengene.number=eg, geneid=geneid, genenames=genenames)
+    imp.data<-list(x=mat.imp, eigengene.number=eg, geneid=geneid, genenames=genenames)
     ans.samr.obj<-samr(ans.data, resp.type=resp.type, nperms=nperms)
     imp.samr.obj<-samr(imp.data, resp.type=resp.type, nperms=nperms)
     ans.delta<-samr.compute.delta.table(ans.samr.obj)
@@ -62,6 +63,10 @@ BLCIcal<-function(mat.com, mat.imp,resp.type="Pattern discovery",nperms=100){
     imp.nonsiggene.list<-imp.nonsiggenes[,2]
     ans.imp.siggenes.int<-intersect(ans.siggene.list,imp.siggene.list)
     ans.imp.nonsiggenes.int<-intersect(ans.nonsiggene.list,imp.nonsiggene.list)
-    blci<-length(ans.imp.siggenes.int)/length(ans.siggene.list) + length(ans.imp.nonsiggenes.int)/length(ans.nonsiggene.list) - 1
+    if (length(ans.imp.siggenes.int) != 0 & length(ans.siggene.list) != 0)
+        blci<-length(ans.imp.siggenes.int)/length(ans.siggene.list) + length(ans.imp.nonsiggenes.int)/length(ans.nonsiggene.list) - 1
+    else
+        blci<-length(ans.imp.nonsiggenes.int)/length(ans.nonsiggene.list) - 1
+
     return(blci)
 }

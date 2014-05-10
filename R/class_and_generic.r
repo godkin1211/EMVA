@@ -105,7 +105,7 @@ setMethod("impute","TEData", function(x, method, ...) {
 setMethod(f = "evaluator", signature = "IMPData", definition = function(x, method, ...) {
     switch(method,
             nrmse = NRMSEcal(x@ori.data, x@imputed.data, x@miss.idx),
-            blci = BLCIcal(x@ori.data, x@imputed.data,...),
+            blci = BLCIcal(x@ori.data, x@imputed.data, ...),
             cpp = CPPcal(x@ori.data, x@imputed.data, k=10,...)
     )
 })
