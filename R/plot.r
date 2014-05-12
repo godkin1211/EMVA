@@ -1,4 +1,6 @@
+# Refine the resolution of grids of the plot.
 number_ticks <- function(n) {function(limits) pretty(limits, n)}
+
 plotter <- function(x, index="NRMSE", fileformat="png", xlab) {
     x.transform <- cbind(melt(x, variable.name="Method", value.name=index),xlab)
     if (index == "NRMSE") {

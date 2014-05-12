@@ -2,29 +2,19 @@
 \alias{CPPcal}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
-This function is for CPP calculation.
+Calculates CPP (Conserved Pair Proportion).
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+An implementation of CPP. See A. G. de Brevern et al., 2004.
 }
 \usage{
-CPPcal(mat.com, mat.imp, k, iter.max = 10)
+CPPcal(mat.com, mat.imp, k)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{mat.com}{
-%%     ~~Describe \code{mat.com} here~~
-}
-  \item{mat.imp}{
-%%     ~~Describe \code{mat.imp} here~~
-}
-  \item{k}{
-%%     ~~Describe \code{k} here~~
-}
-  \item{iter.max}{
-%%     ~~Describe \code{iter.max} here~~
-}
+  \item{mat.com}{Complete data matrix.}
+  \item{mat.imp}{Imputed data matrix.}
+  \item{k}{Number of groups, as in \code{\link{cutree}.}}
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
@@ -37,14 +27,10 @@ CPPcal(mat.com, mat.imp, k, iter.max = 10)
 %% ...
 }
 \references{
-%% ~put references to the literature/web site here ~
+Alexandre G de Brevern, Serge Hazout and Alain Malpertuy. Influence of microarray experiments missing values on the stability of gene groups by hierarchical clustering. \emph{BMC Bioinformatics}, 5:114.
 }
-\author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
+\author{Chiachun Chiu and Weisheng Wu.}
+\note{}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
@@ -57,12 +43,16 @@ CPPcal(mat.com, mat.imp, k, iter.max = 10)
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-function (mat.com, mat.imp, k, iter.max = 10) 
+function (mat.com, mat.imp, k) 
 {
-    ans.clustered <- kmeans(mat.com, k, iter.max)
-    ans.clust <- ans.clustered$cluster
-    imp.clustered <- kmeans(mat.imp, k, iter.max)
-    imp.clust <- imp.clustered$cluster
+    #ans.clustered <- kmeans(mat.com, k, iter.max)
+    ans.clustered<-hclust(dist(mat.com),method="complete")
+    #ans.clust <- ans.clustered$cluster
+    ans.clust<-cutree(ans.clustered,k=k)
+    #imp.clustered <- kmeans(mat.imp, k, iter.max)
+    imp.clustered<-hclust(dist(mat.imp),method="complete")
+    #imp.clust <- imp.clustered$cluster
+    imp.clust<-cutree(imp.clustered,k=k)
     cpptable <- matrix(nr = k, nc = k)
     rownames(cpptable) <- sprintf("C.ans.\%i", 1:k)
     colnames(cpptable) <- sprintf("C.imp.\%i", 1:k)

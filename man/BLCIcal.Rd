@@ -1,29 +1,20 @@
 \name{BLCIcal}
 \alias{BLCIcal}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-This function is for BLCI calculation.
-}
+\title{Calculates biomarker list concordance index for differentially expressed gene detection.}
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Implementation of BLCI computation. See S. Oh et al., 2011.
 }
 \usage{
 BLCIcal(mat.com, mat.imp, resp.type = "Pattern discovery", nperms = 100)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{mat.com}{
-%%     ~~Describe \code{mat.com} here~~
+  \item{mat.com}{Complete data matrix.}
+  \item{mat.imp}{Imputed data matrix.}
+  \item{resp.type}{ Setting for problem type, as in \code{\link{samr}.}
 }
-  \item{mat.imp}{
-%%     ~~Describe \code{mat.imp} here~~
-}
-  \item{resp.type}{
-%%     ~~Describe \code{resp.type} here~~
-}
-  \item{nperms}{
-%%     ~~Describe \code{nperms} here~~
-}
+  \item{nperms}{ Number of permutations used to estimate discovery rates, as in \code{\link{samr}.}
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
@@ -36,14 +27,12 @@ BLCIcal(mat.com, mat.imp, resp.type = "Pattern discovery", nperms = 100)
 %% ...
 }
 \references{
-%% ~put references to the literature/web site here ~
+Sunghee Oh, Dongwan D. Kang, Guy N. Brock and George C. Tseng. Biological impact of missing-value imputation on downstream analyses of gene expression profiles. \emph{Bioinformatics}, 27(1): 78-86, 2011.
 }
 \author{
-%%  ~~who you are~~
+Chiachun Chiu and Weisheng Wu.
 }
-\note{
-%%  ~~further notes~~
-}
+\note{Requires \code{\link{samr}}.}
 
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
@@ -101,5 +90,5 @@ function (mat.com, mat.imp, resp.type = "Pattern discovery",
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ differentially expressed genes }
+\keyword{ missing value imputation }% __ONLY ONE__ keyword per line

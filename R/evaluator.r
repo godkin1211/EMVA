@@ -16,11 +16,15 @@ NRMSEcal<-function(mat.com, mat.imp, miss.idx) {
 }
 
 # CPP
-CPPcal<-function(mat.com,mat.imp,k,iter.max=10){
-    ans.clustered<-kmeans(mat.com,k,iter.max)
-    ans.clust<-ans.clustered$cluster
-    imp.clustered<-kmeans(mat.imp,k,iter.max)
-    imp.clust<-imp.clustered$cluster
+CPPcal<-function(mat.com,mat.imp,k){
+    #ans.clustered<-kmeans(mat.com,k,iter.max)
+    ans.clustered<-hclust(dist(mat.com),method="complete")
+    #ans.clust<-ans.clustered$cluster
+    ans.clust<-cutree(ans.clustered,k=k)
+    #imp.clustered<-kmeans(mat.imp,k,iter.max)
+    imp.clustered<-hclust(dist(mat.imp),method="complete")
+    #imp.clust<-imp.clustered$cluster
+    imp.clust<-cutree(imp.clustered,k=k)
     cpptable<-matrix(nr=k,nc=k)
     rownames(cpptable)<-sprintf("C.ans.%i",1:k)
     colnames(cpptable)<-sprintf("C.imp.%i",1:k)
