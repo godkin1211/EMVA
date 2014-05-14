@@ -17,28 +17,53 @@ RAVGimpute<-function(x){
 
 # KNN
 KNNimpute<-function(x, k=15, sim.method="euclidean"){
-    miss.idx<-is.na(x)
-    x.missRowIdx<-which(rowSums(miss.idx) != 0)
-    x.miss<-x[x.missRowIdx,]
-    x.comp<-x[-x.missRowIdx,]
-    x.imp<-t(apply(x.miss,1,function(i){
-        missidx<-which(is.na(i))
-        vec.usable<-i[-missidx]
-        neighbor.pool<-x.comp[,-missidx]
-        similarities<-similarityCal(vec.usable,neighbor.pool,method=sim.method)
-        neighborhood<-order(similarities,decreasing=TRUE)[1:k]
-        imp.values<-sapply(missidx,function(j) weight.avg<-similarities[neighborhood] %*% x.comp[neighborhood,j] / sum(similarities[neighborhood]))
-        i[missidx]<-imp.values
+    # Impute the row that are all-missing or almost-all-missing with column-average.
+    if (length(which(rowSums(is.na(x))==ncol(x)))) for (i in which(rowSums(is.na(x))==ncol(x))) x[i,] <- colMeans(x,na.rm=T)
+    
+    if (length(which(rowSums(is.na(x))==ncol(x)-1))) {
+        for(i in which(rowSums(is.na(x))==ncol(x)-1)) {
+            missCol <- which(is.na(x[i,]))
+            x[i,missCol] <- colMeans(x,na.rm=T)[missCol]
+        }
+    }
+    
+    miss.idx <- is.na(x)
+    x.missRowIdx <- which(rowSums(miss.idx) != 0)
+    x.miss <- x[x.missRowIdx,]
+    x.comp <- x[-x.missRowIdx,]
+    x.imp <- t(apply(x.miss,1,function(i){
+        missidx <- which(is.na(i))
+        vec.usable <- i[-missidx]
+        neighbor.pool <- x.comp[,-missidx,drop=F]
+        similarities <- similarityCal(vec.usable,neighbor.pool,method=sim.method)
+        neighborhood <- order(similarities,decreasing=TRUE)[1:k]
+        imp.values <- sapply(missidx,function(j) {
+            weight.avg<-similarities[neighborhood] %*% x.comp[neighborhood,j,drop=F] / sum(similarities[neighborhood])
+            weight.avg
+        })
+        i[missidx] <- imp.values
         return(i)
     }))
-    x[x.missRowIdx,]<-x.imp
+    x[x.missRowIdx,] <- x.imp
     return(x)
 }
 
 # IKNN
 IKNNimpute<-function(x, k=10, sim.method="euclidean", iter=3, e=1e-3) {
+    missIdx <- is.na(x)
+    rowNum <- nrow(x)
+    colNum <- ncol(x)
+    # Impute the row that are all-missing or almost-all-missing with column-average.
+    if (length(which(rowSums(is.na(x))==colNum))) for (i in which(rowSums(is.na(x))==colNum)) x[i,] <- colMeans(x,na.rm=T)
+    
+    if (length(which(rowSums(is.na(x))==colNum-1))) {
+        for(i in which(rowSums(is.na(x))==colNum-1)) {
+            missCol <- which(is.na(x[i,]))
+            x[i,missCol] <- colMeans(x,na.rm=T)[missCol]
+        }
+    }
+    
     missIdx<-is.na(x)
-    rowNum<-nrow(x)
     miss.RowIdx<-which(rowSums(missIdx) != 0)
     x.ravged<-RAVGimpute(x)
     x.miss<-(cbind(1:rowNum, x))[miss.RowIdx,]
@@ -75,6 +100,16 @@ IKNNimpute<-function(x, k=10, sim.method="euclidean", iter=3, e=1e-3) {
 SKNNimpute<-function(x, k=10, sim.method="euclidean"){
     rowNum<-nrow(x)
     colNum<-ncol(x)
+    missIdx<-is.na(x)
+    # Impute the row that are all-missing or almost-all-missing with column-average.
+    if (length(which(rowSums(missIdx)==colNum))) for (i in which(rowSums(missIdx)==colNum)) x[i,] <- colMeans(x,na.rm=T)
+    
+    if (length(which(rowSums(missIdx)==colNum-1))) {
+        for(i in which(rowSums(missIdx)==colNum-1)) {
+            missCol <- which(is.na(x[i,]))
+            x[i,missCol] <- colMeans(x,na.rm=T)[missCol]
+        }
+    }
     missIdx<-is.na(x)
     miss.RowIdx<-which(rowSums(missIdx)!=0)
     x.completeRows<-x[-miss.RowIdx,]
@@ -119,17 +154,28 @@ LSimpute<-function(x, k=15, sim.method="euclidean", e=1e-6){
     rowNum<-nrow(x)
     colNum<-ncol(x)
     missIdx<-is.na(x)
-    miss.RowIdx<-which(rowSums(missIdx)!=0)
+    # Impute the row that are all-missing or almost-all-missing with column-average.
+    if (length(which(rowSums(missIdx)==colNum))) for (i in which(rowSums(missIdx)==colNum)) x[i,] <- colMeans(x,na.rm=T)
+    
+    if (length(which(rowSums(missIdx)==colNum-1))) {
+        for(i in which(rowSums(missIdx)==colNum-1)) {
+            missCol <- which(is.na(x[i,]))
+            x[i,missCol] <- colMeans(x,na.rm=T)[missCol]
+        }
+    }
+
+    miss.RowIdx<-which(rowSums(is.na(x))!=0)
     x.completeRows<-x[-miss.RowIdx,]
     x.missingRows<-x[miss.RowIdx,]
     x.imputed<-t(apply(x.missingRows,1,function(i){
         missColIdx<-which(is.na(i))
-        dist.list<-similarityCal(i[-missColIdx], x.completeRows[,-missColIdx], method=sim.method)
+        dist.list<-similarityCal(i[-missColIdx], x.completeRows[,-missColIdx,drop=F], method=sim.method)
         neighborsIdx<-order(dist.list,decreasing=T)[1:k]
         neighbor.sim<-dist.list[neighborsIdx]
         weight<-((neighbor.sim^2)/(1-(neighbor.sim)^2+e))^2
         fit.list<-lapply(neighborsIdx, function(m){
             fit<-lm(i[-missColIdx] ~ x.completeRows[m,-missColIdx])
+            if (is.na(fit$coefficients[[2]])) fit$coefficients[[2]] <- 0
             reg<-c(fit$coefficients[[1]],fit$coefficients[[2]])
             return(reg)
         })
@@ -152,7 +198,18 @@ LSimpute<-function(x, k=15, sim.method="euclidean", e=1e-6){
 
 # LLS
 LLSimpute<-function(x, k=50, sim.method="euclidean"){
-    missidx<-is.na(x)
+    colNum <- ncol(x)
+    missidx <- is.na(x)
+    # Impute the row that are all-missing or almost-all-missing with column-average.
+    if (length(which(rowSums(missidx)==colNum))) for (i in which(rowSums(missidx)==colNum)) x[i,] <- colMeans(x,na.rm=T)
+    
+    if (length(which(rowSums(missidx)==colNum-1))) {
+        for(i in which(rowSums(missidx)==colNum-1)) {
+            missCol <- which(is.na(x[i,]))
+            x[i,missCol] <- colMeans(x,na.rm=T)[missCol]
+        }
+    }
+    missidx <- is.na(x)
     missRowIdx<-which(rowSums(missidx) != 0)
     x.completePart<-x[-missRowIdx,]
     x.missingPart<-x[missRowIdx,]

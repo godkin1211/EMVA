@@ -86,12 +86,15 @@ simulator<-function(inputData,
         
         for (j in seq(runs)){
             # Generating testing data
-			cat("\n==============\nMissing Rate:",missRates[i],"%\n==============\n\n")
-			cat("\n########\n# Run:",j,"\n########\n")
+			cat("#",paste(rep("#",25),collapse=""),
+                "\n# Missing Rate:",missRates[i],"%",rep(" ",3),
+                "#\n# Runs:",j,rep(" ",4),rep(" ",4),
+                "#\n#",paste(rep("#",25),collapse=""),"\n")
+            
             testData <- TEdata(inputData, missRate)
             for (m in selected.md) {
                 if (m == "zero") {
-                    cat("***************\n* ZEROimpute.......\n***************\n")
+                    cat("********************\n* ZEROimpute....... *\n********************\n")
                     imputedData <- impute(testData, method="zero")
                     for (p in performance.idx) {
                         performance <-evaluator(imputedData,method=p)
@@ -101,7 +104,7 @@ simulator<-function(inputData,
                         else zero.blci[j] <- performance
                     }
                 } else if (m == "ravg") {
-                    cat("***************\n* RAVGimpute.......\n***************\n")
+                    cat("********************\n* RAVGimpute....... *\n********************\n")
                     imputedData <- impute(testData, method="ravg")
                     for (p in performance.idx) {
                         performance <-evaluator(imputedData,method=p)
@@ -111,7 +114,7 @@ simulator<-function(inputData,
                         else ravg.blci[j] <- performance
                     }
                 } else if (m == "knn") {
-                    cat("***************\n* KNNimpute.......\n***************\n")
+                    cat("********************\n* KNNimpute....... *\n********************\n")
                     imputedData <- impute(testData, method="knn", k=ksets$knn.k)
                     for (p in performance.idx) {
                         performance <-evaluator(imputedData,method=p)
@@ -121,7 +124,7 @@ simulator<-function(inputData,
                         else knn.blci[j] <- performance
                     }
                 } else if (m == "sknn") {
-                    cat("***************\n* SKNNimpute.......\n***************\n")
+                    cat("********************\n* SKNNimpute....... *\n********************\n")
                     imputedData <- impute(testData, method="sknn", k=ksets$sknn.k)
                     for (p in performance.idx) {
                         performance <-evaluator(imputedData,method=p)
@@ -131,7 +134,7 @@ simulator<-function(inputData,
                         else sknn.blci[j] <- performance
                     }
                 } else if (m == "iknn") {
-                    cat("***************\n* IKNNimpute.......\n***************\n")
+                    cat("********************\n* IKNNimpute....... *\n********************\n")
                     imputedData <- impute(testData, method="iknn", k=ksets$iknn.k)
                     for (p in performance.idx) {
                         performance <-evaluator(imputedData,method=p)
@@ -141,7 +144,7 @@ simulator<-function(inputData,
                         else iknn.blci[j] <- performance
                     }
                 } else if (m == "svd") {
-                    cat("***************\n* SVDimpute.......\n***************\n")
+                    cat("********************\n* SVDimpute....... *\n********************\n")
                     imputedData <- impute(testData, method="svd", k=ksets$svd.k)
                     for (p in performance.idx) {
                         performance <-evaluator(imputedData,method=p)
@@ -151,7 +154,7 @@ simulator<-function(inputData,
                         else svd.blci[j] <- performance
                     }
                 } else if (m == "ls") {
-                    cat("***************\n* LSimpute.......\n***************\n")
+                    cat("********************\n* LSimpute........ *\n********************\n")
                     imputedData <- impute(testData, method="ls", k=ksets$ls.k)
                     for (p in performance.idx) {
                         performance <-evaluator(imputedData,method=p)
@@ -161,7 +164,7 @@ simulator<-function(inputData,
                         else ls.blci[j] <- performance
                     }
                 } else if (m == "lls") {
-                    cat("***************\n* LLSimpute.......\n***************\n")
+                    cat("********************\n* LLSimpute....... *\n********************\n")
                     imputedData <- impute(testData, method="lls", k=ksets$lls.k)
                     for (p in performance.idx) {
                         performance <-evaluator(imputedData,method=p)
@@ -171,7 +174,7 @@ simulator<-function(inputData,
                         else lls.blci[j] <- performance
                     }
                 } else {
-                    cat("***************\n* USRimpute.......\n***************\n")
+                    cat("********************\n* USRimpute....... *\n********************\n")
                     imputedData <- impute(testData, method="usr")
                     for (p in performance.idx) {
                         performance <-evaluator(imputedData,method=p)
@@ -181,24 +184,18 @@ simulator<-function(inputData,
                         else usr.blci[j] <- performance
                     }
                 }
+				Sys.sleep(0.1)
             }
         }
 
         for (p in performance.idx) {
             for (m in selected.md) {
-                if (p == "nrmse") {
+                if (p == "nrmse") 
                     eval(parse(text=paste("NRMSEs.table$",m,"[",i,"]<-mean(",m,".",p,")",sep="")))
-                    #cat("Results:\n")
-                    #print(NRMSEs.table)
-                } else if (p == "cpp") {
+                else if (p == "cpp")
                     eval(parse(text=paste("CPPs.table$",m,"[",i,"]<-mean(",m,".",p,")",sep="")))
-                    #cat("Results:\n")
-                    #print(CPPs.table)
-                } else {
+                else
                     eval(parse(text=paste("BLCIs.table$",m,"[",i,"]<-mean(",m,".",p,")",sep="")))
-                    #cat("Results:\n")
-                    #print(BLCIs.table)
-                }
             }
         }
     }

@@ -12,9 +12,8 @@ BLCIcal(mat.com, mat.imp, resp.type = "Pattern discovery", nperms = 100)
 \arguments{
   \item{mat.com}{Complete data matrix.}
   \item{mat.imp}{Imputed data matrix.}
-  \item{resp.type}{ Setting for problem type, as in \code{\link{samr}.}
-}
-  \item{nperms}{ Number of permutations used to estimate discovery rates, as in \code{\link{samr}.}
+  \item{resp.type}{ Setting for problem type, as in \code{\link{samr}.}}
+  \item{nperms}{ Number of permutations used to estimate discovery rates, as in \code{\link{samr}.}}
 }
 \details{
 %%  ~~ If necessary, more details than the description above ~~
