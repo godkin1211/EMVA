@@ -1,7 +1,7 @@
-Package: IMDE
+Package: EMVA
 Type: Package
-Title: Impute your Missing Data Easily
-Version: 0.9
+Title: An Enivronment for Missing Values imputation Algorithms comparison
+Version: 1.0
 Date: 2014-05-11
 Author: Chiachun Chiu, Weisheng Wu
 Maintainer: Chiachun Chiu <jiajyun.ciou@gmail.com>
