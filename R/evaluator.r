@@ -1,4 +1,3 @@
-#if(!"samr" %in% names(sessionInfo()$otherPkgs)) require(samr)
 ##########################
 # Performance evaluator
 ##########################
@@ -9,22 +8,46 @@ NRMSEcal<-function(mat.com, mat.imp, miss.idx) {
     if (sum(is.na(mat.imp))!=0) stop("There exists NAs in imputed data!\n")
     if (!is.logical(miss.idx)) stop("Problems in miss.idx!\n")
     if (length(mat.com[miss.idx])!=length(mat.imp[miss.idx])) stop("Length inequivalent!\n")
-    if (!is.matrix(mat.com)) mat.com<-as.matrix(mat.com)
-    if (!is.matrix(mat.imp)) mat.com<-as.matrix(mat.com)
+    if (!checkObj(mat.com)) {
+        if (checkObj(mat.com))
+            mat.com<-as.matrix(mat.com)
+        else
+            stop("Invalid object type on mat.com!")
+    }
+    if (!checkObj(mat.imp)) {
+        if (checkObj)
+            mat.com<-as.matrix(mat.com)
+        else
+            stop("Invalid object type on mat.com!")
+    }
     nrmse<-sqrt(mean((mat.com[miss.idx]-mat.imp[miss.idx])^2)/var(mat.com[miss.idx]))
     return(nrmse)
 }
 
 # CPP
-CPPcal<-function(mat.com,mat.imp,k){
-    #ans.clustered<-kmeans(mat.com,k,iter.max)
-    ans.clustered<-hclust(dist(mat.com),method="complete")
-    #ans.clust<-ans.clustered$cluster
-    ans.clust<-cutree(ans.clustered,k=k)
-    #imp.clustered<-kmeans(mat.imp,k,iter.max)
-    imp.clustered<-hclust(dist(mat.imp),method="complete")
-    #imp.clust<-imp.clustered$cluster
-    imp.clust<-cutree(imp.clustered,k=k)
+CPPcal<-function(mat.com,mat.imp){
+    if (sum(is.na(mat.com))!=0) stop("There exists NAs in ans!\n")
+    if (sum(is.na(mat.imp))!=0) stop("There exists NAs in imputed data!\n")
+    if (!checkObj(mat.com)) {
+        if (checkObj(mat.com))
+            mat.com<-as.matrix(mat.com)
+        else
+            stop("Invalid object type on mat.com!")
+    }
+    if (!checkObj(mat.imp)) {
+        if (checkObj)
+            mat.com<-as.matrix(mat.com)
+        else
+            stop("Invalid object type on mat.com!")
+    }
+    # Using Affinity propagation (AP) clustering to determine the selection of k in kmeans
+    if (! "apcluster" %in% sessionInfo()$otherPkgs) library(aplcuster)
+    cluster.result <- apcluster(negDistMat(r=2), mat.com)
+    k <- length(cluster.result@clusters)
+    ans.clustered<-kmeans(mat.com,k)
+    ans.clust<-ans.clustered$cluster
+    imp.clustered<-kmeans(mat.imp,k)
+    imp.clust<-imp.clustered$cluster
     cpptable<-matrix(nr=k,nc=k)
     rownames(cpptable)<-sprintf("C.ans.%i",1:k)
     colnames(cpptable)<-sprintf("C.imp.%i",1:k)
@@ -43,6 +66,19 @@ CPPcal<-function(mat.com,mat.imp,k){
 # BLCI
 BLCIcal<-function(mat.com, mat.imp, resp.type="Pattern discovery", eg=10, nperms=100){
     if (sum(is.na(mat.imp))) stop("There exists NAs in imputed matrix!")
+    if (sum(is.na(mat.imp))!=0) stop("There exists NAs in imputed data!\n")
+    if (!checkObj(mat.com)) {
+        if (checkObj(mat.com))
+            mat.com<-as.matrix(mat.com)
+        else
+            stop("Invalid object type on mat.com!")
+    }
+    if (!checkObj(mat.imp)) {
+        if (checkObj)
+            mat.com<-as.matrix(mat.com)
+        else
+            stop("Invalid object type on mat.com!")
+    }
     genenames<-paste("GENE",as.character(1:nrow(mat.com)),sep="")
     geneid<-as.character(1:nrow(mat.com))
     ans.data<-list(x=mat.com, eigengene.number=eg, geneid=geneid, genenames=genenames)

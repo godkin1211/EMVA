@@ -4,6 +4,7 @@ exportMethods(
     "getMissRate",
     "getSize",
     "impute",
+    "checkObj",
     "show" 
 )
 exportClasses(

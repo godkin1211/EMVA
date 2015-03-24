@@ -2,21 +2,22 @@
 # Imputation Algorithms   #
 ###########################
 # Zero
-ZEROimpute<-function(x) {
+ZEROimpute<-function(x) { 
+    if(!chackObj(x)) stop("Invalid object type on input")
     x[is.na(x)]<-0
-    return(x)
+    return(x) 
 }
 
 #Row average
 RAVGimpute<-function(x){
-    x.imp<-t(apply(x,1,function(i){
-        i[is.na(i)]<-mean(i,na.rm=TRUE); i
-    }))
+    if (!checkObj(x)) stop("Invalid object type on input!")
+    x.imp<-t(apply(x,1,function(i){ i[is.na(i)]<-mean(i,na.rm=TRUE); i }))
     return(x.imp)
 }
 
 # KNN
 KNNimpute<-function(x, k=15, sim.method="euclidean"){
+    if (!checkObj(x)) stop("Invalid object type on input!")
     # Impute the row that are all-missing or almost-all-missing with column-average.
     if (length(which(rowSums(is.na(x))==ncol(x)))) for (i in which(rowSums(is.na(x))==ncol(x))) x[i,] <- colMeans(x,na.rm=T)
     
@@ -50,6 +51,7 @@ KNNimpute<-function(x, k=15, sim.method="euclidean"){
 
 # IKNN
 IKNNimpute<-function(x, k=10, sim.method="euclidean", iter=3, e=1e-3) {
+    if (!checkObj(x)) stop("Invalid object type on input!")
     missIdx <- is.na(x)
     rowNum <- nrow(x)
     colNum <- ncol(x)
@@ -98,6 +100,7 @@ IKNNimpute<-function(x, k=10, sim.method="euclidean", iter=3, e=1e-3) {
 
 # SKNN
 SKNNimpute<-function(x, k=10, sim.method="euclidean"){
+    if (!checkObj(x)) stop("Invalid object type on input!")
     rowNum<-nrow(x)
     colNum<-ncol(x)
     missIdx<-is.na(x)
@@ -135,6 +138,7 @@ SKNNimpute<-function(x, k=10, sim.method="euclidean"){
 
 # SVD
 SVDimpute<-function(x, k=15, iters=10){
+    if (!checkObj(x)) stop("Invalid object type on input!")
     if (ncol(x) < k) k<-ncol(x)
     missIdx <- is.na(x)
 	# First, replace MVs with row-average/col-average
@@ -151,6 +155,7 @@ SVDimpute<-function(x, k=15, iters=10){
 
 # LSimpute
 LSimpute<-function(x, k=15, sim.method="euclidean", e=1e-6){
+    if (!checkObj(x)) stop("Invalid object type on input!")
     rowNum<-nrow(x)
     colNum<-ncol(x)
     missIdx<-is.na(x)
@@ -198,6 +203,7 @@ LSimpute<-function(x, k=15, sim.method="euclidean", e=1e-6){
 
 # LLS
 LLSimpute<-function(x, k=50, sim.method="euclidean"){
+    if (!checkObj(x)) stop("Invalid object type on input!")
     colNum <- ncol(x)
     missidx <- is.na(x)
     # Impute the row that are all-missing or almost-all-missing with column-average.
@@ -231,4 +237,4 @@ LLSimpute<-function(x, k=50, sim.method="euclidean"){
 }
 
 # User-defined
-#USRimpute<-function(x, ...) {  }
+USRimpute<-function(x, ...) {}
