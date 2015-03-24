@@ -41,7 +41,7 @@ CPPcal<-function(mat.com,mat.imp){
             stop("Invalid object type on mat.com!")
     }
     # Using Affinity propagation (AP) clustering to determine the selection of k in kmeans
-    if (! "apcluster" %in% sessionInfo()$otherPkgs) library(aplcuster)
+    if (! "apcluster" %in% sessionInfo()$otherPkgs) library(apcluster)
     cluster.result <- apcluster(negDistMat(r=2), mat.com)
     k <- length(cluster.result@clusters)
     ans.clustered<-kmeans(mat.com,k)
@@ -64,7 +64,8 @@ CPPcal<-function(mat.com,mat.imp){
 }
 
 # BLCI
-BLCIcal<-function(mat.com, mat.imp, resp.type="Pattern discovery", eg=10, nperms=100){
+BLCIcal<-function(mat.com, mat.imp, design.matrix=NULL, contrasts=NULL){
+    if (! "limma" %in% sessionInfo()$otherPkgs) library(limma)
     if (sum(is.na(mat.imp))) stop("There exists NAs in imputed matrix!")
     if (sum(is.na(mat.imp))!=0) stop("There exists NAs in imputed data!\n")
     if (!checkObj(mat.com)) {
@@ -79,34 +80,43 @@ BLCIcal<-function(mat.com, mat.imp, resp.type="Pattern discovery", eg=10, nperms
         else
             stop("Invalid object type on mat.com!")
     }
-    genenames<-paste("GENE",as.character(1:nrow(mat.com)),sep="")
-    geneid<-as.character(1:nrow(mat.com))
-    ans.data<-list(x=mat.com, eigengene.number=eg, geneid=geneid, genenames=genenames)
-    imp.data<-list(x=mat.imp, eigengene.number=eg, geneid=geneid, genenames=genenames)
-    ans.samr.obj<-samr(ans.data, resp.type=resp.type, nperms=nperms)
-    imp.samr.obj<-samr(imp.data, resp.type=resp.type, nperms=nperms)
-    ans.delta<-samr.compute.delta.table(ans.samr.obj)
-    imp.delta<-samr.compute.delta.table(imp.samr.obj)
-    ans.siggene.table<-samr.compute.siggenes.table(ans.samr.obj, del=0, ans.data, ans.delta, all.genes=T)
-    imp.siggene.table<-samr.compute.siggenes.table(imp.samr.obj, del=0, imp.data, imp.delta, all.genes=T)
-    ans.totalgenes<-rbind(ans.siggene.table$genes.lo, ans.siggene.table$genes.up)
-    imp.totalgenes<-rbind(imp.siggene.table$genes.lo, imp.siggene.table$genes.up)
-    ans.siggene.judge<-as.numeric(ans.totalgenes[,7])
-    imp.siggene.judge<-as.numeric(imp.totalgenes[,7])
-    ans.siggenes<-ans.totalgenes[ans.siggene.judge<10,,drop=F]
-    imp.siggenes<-imp.totalgenes[imp.siggene.judge<10,,drop=F]
-    ans.siggene.list<-ans.siggenes[,2]
-    imp.siggene.list<-imp.siggenes[,2]
-    ans.nonsiggenes<-ans.totalgenes[ans.siggene.judge >= 10,,drop=F]
-    imp.nonsiggenes<-imp.totalgenes[imp.siggene.judge >= 10,,drop=F]
-    ans.nonsiggene.list<-ans.nonsiggenes[,2]
-    imp.nonsiggene.list<-imp.nonsiggenes[,2]
-    ans.imp.siggenes.int<-intersect(ans.siggene.list,imp.siggene.list)
-    ans.imp.nonsiggenes.int<-intersect(ans.nonsiggene.list,imp.nonsiggene.list)
-    if (length(ans.imp.siggenes.int) != 0 & length(ans.siggene.list) != 0)
-        blci<-length(ans.imp.siggenes.int)/length(ans.siggene.list) + length(ans.imp.nonsiggenes.int)/length(ans.nonsiggene.list) - 1
-    else
-        blci<-length(ans.imp.nonsiggenes.int)/length(ans.nonsiggene.list) - 1
+    DE.table.com <- DE.table.imp <-NULL
+    if (is.null(design.matrix)) {
+        cat("\nBecause design.matrix does not be set, 
+            EMVA will simply assume that this is two-group experiment.\n")
+        colNum <- ncol(mat.com)
+        if (colNum %% 2 != 0) stop("The number of experiments/conditions is an odd number!")
+        Group <- factor(rep(c("WT","Mu"), each=colNum/2), levels=c("WT","Mu"))
+        design.matrix <- model.matrix(~0+Group)
+        colnames(design.matrix) <- levels(Group)
+        fit.com <- lmFit(mat.com, design.matrix)
+        fit.imp <- lmFit(mat.imp, design.matrix)
+        cont.matrix <- makeContrasts(Mu-WT, levels=design.matrix)
+    } else {
+        fit.com <- lmFit(mat.com, design.matrix)
+        fit.imp <- lmFit(mat.imp, design.matrix)
+        cont.matrix <- contrasts
+    }
+    
+    fit2.com <- contrasts.fit(fit.com, cont.matrix)
+    fit2.com <- eBayes(fit2.com, 0.01)
+    DE.table.com <- topTable(fit2.com, adjust="fdr", sort.by="B", number=nrow(mat.com))
+    
+    fit2.imp <- contrasts.fit(fit.imp, cont.matrix)
+    fit2.imp <- eBayes(fit2.imp, 0.01)
+    DE.table.imp <- topTable(fit2.imp, adjust="fdr", sort.by="B", number=nrow(mat.imp))
+
+    num.siggenes.com <- sum(DE.table.com$adj.P.Val <= 0.05)
+    num.nonsiggenes.com <- nrow(mat.com) - num.siggenes.com
+    num.siggenes.imp <- sum(DE.table.imp$adj.P.Val <= 0.05)
+    num.nonsiggenes.imp <- nrow(mat.imp) - num.siggenes.imp
+    
+    blci <- num.siggenes.com/num.siggenes.imp + num.nonsiggenes.com/num.nonsiggenes.imp - 1
+    
+    #if (length(ans.imp.siggenes.int) != 0 & length(ans.siggene.list) != 0)
+    #    blci<-length(ans.imp.siggenes.int)/length(ans.siggene.list) + length(ans.imp.nonsiggenes.int)/length(ans.nonsiggene.list) - 1
+    #else
+    #    blci<-length(ans.imp.nonsiggenes.int)/length(ans.nonsiggene.list) - 1
 
     return(blci)
 }

@@ -9,7 +9,7 @@ simulator<-function(inputData,
 {
 
   # Check each argument
-    if (!is.object(inputData)) stop("Data type error!")
+    if (!is.object(inputData)) stop("Object type error!")
     if (sum(selected.md %in% c("zero","ravg","knn","iknn","sknn","svd","ls","lls","usr")) != length(selected.md))
         stop("Please select correct methods we provide.")
     if (sum(performance.idx %in% c("nrmse","cpp","blci")) != length(performance.idx))
