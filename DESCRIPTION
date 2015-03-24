@@ -2,9 +2,9 @@ Package: EMVA
 Type: Package
 Title: An Enivronment for Missing Values imputation Algorithms comparison
 Version: 1.0
-Date: 2014-05-11
+Date: 2015-03-11
 Author: Chiachun Chiu, Weisheng Wu
 Maintainer: Chiachun Chiu <jiajyun.ciou@gmail.com>
 Description: Impute misssing values occuring in microarray or gel-based proteomic data.
 License: GPL-3
-Depends: methods, MASS, ggplot2, samr, impute, reshape2, gtools, mailR
+Depends: methods, MASS, ggplot2, limma, impute, apcluster, reshape2, gtools, mailR
