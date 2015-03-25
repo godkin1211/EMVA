@@ -1,29 +1,31 @@
-simulator<-function(inputData,
-                    selected.md=c("zero","ravg","knn","svd","lls"),
-                    runs=5,
-                    ksets=list(knn.k=10,iknn.k=10,sknn.k=10,svd.k=10,ls.k=10,lls.k=50),
-                    performance.idx="nrmse",
-                    missRates=c(1,5,10,15,20),
-                    output.format="png"
-					)
+simulator<-function(inputData, selected.md=c("zero","ravg","knn","svd","lls"),
+                    runs=5, ksets=list(knn.k=10,iknn.k=10,sknn.k=10,svd.k=10,ls.k=10,lls.k=50),
+                    performance.idx="nrmse", missRates=c(1,5,10,15,20), output.format="png")
 {
 
   # Check each argument
-    if (!is.object(inputData)) stop("Object type error!")
+    if (!is.object(inputData)) {
+        if (inputData <- MVdata(inputData))
+            cat("Your input is not MVData-class object, EMVA automatically read this input as a text file")
+        else
+            stop("Invalid input!")
+    }
+    
     if (sum(selected.md %in% c("zero","ravg","knn","iknn","sknn","svd","ls","lls","usr")) != length(selected.md))
-        stop("Please select correct methods we provide.")
+        stop("Please select supported methods.")
+    
     if (sum(performance.idx %in% c("nrmse","cpp","blci")) != length(performance.idx))
-        stop("Please select correct performance indices we provide.")
+        stop("Please select supported performance indices.")
     
   # Construct an adequate data-structure to store the results from each performance evaluator.
     available.md <- c("zero","ravg","knn","iknn","sknn","svd","ls","lls","usr")
     table.construct <- strmacro(index="NRMSEs",
-                                expr= function(x,y){
-                                    index.table <- as.data.frame(matrix(nr=length(x),nc=length(y)))
-                                    colnames(index.table) <- y
-                                    rownames(index.table) <- x
-                                    return(index.table)
-                                    })
+                        expr= function(x,y){
+                                index.table <- as.data.frame(matrix(nr=length(x),nc=length(y)))
+                                colnames(index.table) <- y
+                                rownames(index.table) <- x
+                                return(index.table)
+                            })
 
     table.construct.nrmse <- table.construct(index="NRMSEs")
     table.construct.cpp<-table.construct(index="CPPs")
