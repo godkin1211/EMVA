@@ -3,7 +3,7 @@
 ###########################
 # Zero
 ZEROimpute<-function(x) { 
-    if(!chackObj(x)) stop("Invalid object type on input")
+    if(!checkObj(x)) stop("Invalid object type on input")
     x[is.na(x)]<-0
     return(x) 
 }

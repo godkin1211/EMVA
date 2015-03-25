@@ -88,10 +88,10 @@ simulator<-function(inputData, selected.md=c("zero","ravg","knn","svd","lls"),
         
         for (j in seq(runs)){
             # Generating testing data
-			cat("#",paste(rep("#",25),collapse=""),
+			cat("#",paste(rep("#",27),collapse=""),
                 "\n# Missing Rate:",missRates[i],"%",rep(" ",3),
                 "#\n# Runs:",j,rep(" ",4),rep(" ",4),
-                "#\n#",paste(rep("#",25),collapse=""),"\n")
+                "#\n",paste(rep("#",27),collapse=""),"\n")
             
             testData <- TEdata(inputData, missRate)
             for (m in selected.md) {

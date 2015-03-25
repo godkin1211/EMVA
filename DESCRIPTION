@@ -7,4 +7,4 @@ Author: Chiachun Chiu, Weisheng Wu
 Maintainer: Chiachun Chiu <jiajyun.ciou@gmail.com>
 Description: Impute misssing values occuring in microarray or gel-based proteomic data.
 License: GPL-3
-Depends: methods, MASS, ggplot2, limma, impute, apcluster, reshape2, gtools, mailR
+Depends: methods, MASS, ggplot2, limma, pcaMethods, missForest, impute, apcluster, reshape2, gtools

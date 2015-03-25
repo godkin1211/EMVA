@@ -134,28 +134,28 @@ setMethod("getMissRate","IMPData", function(object) sum(is.na(object@imputed.dat
 # Check function
 setMethod("checkObj","numeric", function(object) {
     if (!is.vector(object)) {
-        cat("This obejct is not a vector!")
+        #cat("This obejct is not a vector!")
         return(FALSE)
     } else {
-        cat("This object is a vector!")
+        #cat("This object is a vector!")
         return(TRUE)
     }
 })
 setMethod("checkObj","matrix", function(object) {
     if (!is.matrix(object)) {
-        cat("This object is not a matrix!")
+        #cat("This object is not a matrix!")
         return(FALSE)
     } else {
-        cat("This object is a matrix!")
+        #cat("This object is a matrix!")
         return(TRUE)
     }
 })
 setMethod("checkObj","data.frame", function(object) {
     if (!is.data.frame(object)) {
-        cat("This object is not a data frame!")
+        #cat("This object is not a data frame!")
         return(FALSE)
     } else {
-        cat("This object is a data frame!")
+        #cat("This object is a data frame!")
         return(TRUE)
     }
 })
